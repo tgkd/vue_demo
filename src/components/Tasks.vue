@@ -6,28 +6,36 @@
     .table
       .table__body
         .task(v-for='task in tasks', v-if='tasks.length > 0')
-          span.task__id {{ task.id }}
-          span.task__name(:class="{'task__name--completed': task.done}") {{ task.name }}
-          span.task__expires {{ parseDate(task.expires) }}
-          input.task__checkbox(type='checkbox', :checked='task.done', v-on:change='update(task)')
-          span.task__btn-rm(@click='remove(task.id)') ✖
+          .task-id
+            span.id {{ task.id }}
+          .task-name
+            span.name(:class="{'task-name--completed': task.done}") {{ task.name }}
+          .task-expires
+            .expires {{ parseDate(task.expires) }}
+          .task-checkbox
+            input.checkbox(type='checkbox', :checked='task.done', v-on:change='update(task)')
+          .task-rm
+            span.btn-rm(@click='remove(task.id)') ✖
         .new-task(v-show='currentAction === "all"')
-          input.input--add(type='text',
+          input.input-add(type='text',
                             placeholder='add new task...',
                             v-model='newTask.name',
                             @keyup.enter='create(newTask)')
-          span.btn--add(@click='create(newTask)') ✚
+          span.btn-add(@click='create(newTask)') ✚
+          date-select(v-on:setDate='setDate')
 </template>
 
 <script>
   import { mapGetters } from 'vuex'
   import * as Cookies from 'js-cookie'
   import ActionsPanel from './ActionsPanel.vue'
+  import DateSelect from './DateSelect.vue'
   import moment from 'moment'
   export default {
     name: 'tasks',
     components: {
-      ActionsPanel
+      ActionsPanel,
+      DateSelect
     },
     mounted: function () {
       this.getTasks()
@@ -51,7 +59,10 @@
     },
     methods: {
       parseDate (date) {
-        return moment(date).format('DD-MM-YYYY HH:MM')
+        return moment(date).format('DD/MM/YYYY HH:MM')
+      },
+      setDate (date) {
+        console.log(date)
       },
       setCurrentAction (actionName) {
         this.currentAction = actionName
@@ -97,57 +108,43 @@
 
 <style scoped>
   .table {
-    margin: 0 auto;
-    text-align: left;
+    display: flex;
+    justify-content: center;
+  }
+  .task {
+    display: flex;
+    justify-content: space-between;
+    min-width: 400px;
   }
 
-  .table__body {
-    text-align: left;
-  }
-
-  .task__id {
-    display: inline-block;
-    min-width: 30px;
-  }
-
-  .task__name {
+  .task-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     min-width: 200px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-
   }
 
-  .task__name--completed {
+  .task-name--completed {
     color: #41b883;
   }
 
-  .checkbox-cell {
-    padding: 2px 15px 0;
+  .new-task {
+    position: relative;
+    margin-top: 10px;
   }
 
-  .task__btn-rm {
-    min-width: 40px;
-    cursor: pointer;
-  }
-
-  .input--add {
-    width: 90%;
-    outline: none;
+  .input-add {
+    width: 100%;
     border: none;
-    border-bottom: solid 1px #ccc;
-    color: #2c3e50;
+    border-bottom:solid 1px #ccc;
   }
 
-  .btn--add {
-    min-width: 40px;
-    cursor: pointer;
-  }
-
-  .name-cell {
-    max-width: 200px;
-    min-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .btn-add {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
   }
 
 </style>
