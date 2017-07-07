@@ -21,8 +21,10 @@
                             placeholder='add new task...',
                             v-model='newTask.name',
                             @keyup.enter='create(newTask)')
-          span.btn-add(@click='create(newTask)') ✚
-          date-select(v-on:setDate='setDate')
+          .new-date
+            span.new-task-date(@click='calendarVisible = !calendarVisible') {{newTaskDate}}
+            .calendar-container
+              date-select(v-on:setDate='setDate', :calendar-visible='calendarVisible')
 </template>
 
 <script>
@@ -47,22 +49,30 @@
     computed: {
       ...mapGetters({
         tasks: 'allTasks'
-      })
+      }),
+      newTaskDate: function () {
+        return moment(this.newTask.date).format('DD MMMM')
+      }
     },
     data () {
       return {
         currentAction: 'all',
         newTask: {
-          name: ''
-        }
+          name: '',
+          date: moment()
+        },
+        calendarVisible: false
       }
     },
     methods: {
+      closeCalendar () {
+        this.calendarVisible = false
+      },
       parseDate (date) {
         return moment(date).format('DD/MM/YYYY HH:MM')
       },
       setDate (date) {
-        console.log(date)
+        this.newTask.date = date
       },
       setCurrentAction (actionName) {
         this.currentAction = actionName
@@ -117,6 +127,10 @@
     min-width: 400px;
   }
 
+  .task-id {
+    min-width: 20px;
+  }
+
   .task-name {
     display: flex;
     flex-direction: column;
@@ -135,7 +149,7 @@
   }
 
   .input-add {
-    width: 100%;
+    width: 80%;
     border: none;
     border-bottom:solid 1px #ccc;
   }
@@ -145,6 +159,27 @@
     position: absolute;
     top: 0;
     right: 0;
+  }
+
+  .btn-calendar {
+    position: relative;
+  }
+
+  .new-date {
+    min-width: 50px;
+    cursor: pointer;
+  }
+
+  .new-task {
+    display: flex;
+  }
+
+  .new-task-date {
+    position: relative;
+  }
+
+  .calendar-container {
+    position: relative;
   }
 
 </style>

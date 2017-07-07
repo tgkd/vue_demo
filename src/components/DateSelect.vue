@@ -1,5 +1,9 @@
 <template lang='jade'>
-  .calendar
+  .calendar(v-show='calendarVisible')
+    .navigation
+      .prev-month(@click='previousMonth()') <
+      .current-month {{ monthName + ' ' + year }}
+      .next-month(@click='nextMonth()') >
     .day-names-row
       .day-name(v-for='day in dayNames')
         span {{ day }}
@@ -15,6 +19,7 @@
 
   export default {
     name: 'date-select',
+    props: ['calendarVisible'],
     mounted: function () {
       const year = moment().year()
       const month = moment().month()
@@ -47,17 +52,22 @@
             })
           })
         }
+      },
+      monthName: function () {
+        return moment().month(this.month).format('MMMM')
       }
     },
     methods: {
       setDate (date) {
-        this.$emit('setDate', date)
+        const momentDate = moment().date(date).month(this.month).year(this.year)
+        this.$emit('setDate', momentDate)
       },
       getCalendar (year, month) {
         this.calendar = getCalendar(year, month)
+        this.year = year
+        this.month = month
       },
-      nextMonth (e) {
-        e.preventDefault()
+      nextMonth () {
         const {month, year} = this
         let newMonth
         let newYear
@@ -70,8 +80,7 @@
         }
         this.getCalendar(newYear, newMonth)
       },
-      previousMonth (e) {
-        e.preventDefault()
+      previousMonth () {
         let month
         let year
         if (this.month === 0) {
@@ -92,6 +101,17 @@
     display: flex;
     flex-direction: column;
     max-width: 250px;
+    position: absolute;
+    top: 30px;
+    border: solid 1px #ccc;
+    padding: 15px;
+    box-shadow: 4px 4px 5px 0 rgba(128, 128, 128, 0.5);
+  }
+
+  .navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
   }
 
   .day-names-row {
@@ -115,6 +135,7 @@
     margin: 5px;
     width: 18px;
     height: 18px;
+    cursor: pointer;
   }
 
   .day-name {

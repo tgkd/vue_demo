@@ -21,7 +21,7 @@ const actions = {
   },
 
   async createTask ({ commit }, newTask) {
-    const data = {name: newTask.name, done: false, id: Math.floor(Math.random())}
+    const data = {name: newTask.name, done: false, id: Math.floor(Math.random()), expires: newTask.date}
     await commit(types.CREATE_TASK, await task.create(data))
   },
 
