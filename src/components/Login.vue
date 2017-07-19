@@ -7,7 +7,7 @@
     br
     p {{ error }}
     br
-    button(@click='login(user)') login
+    a.btn-login(@click='login(user)') login
     router-link(to='/') back
 </template>
 
@@ -40,7 +40,7 @@
             this.$router.push({name: 'Tasks'})
           }
         } catch (e) {
-          this.error = 'Unauthorized'
+          this.error = 'Wrong login or password'
         }
       }
     }
@@ -51,5 +51,11 @@
   .input {
     margin: 10px 0;
     height: 20px;
+  }
+
+  .btn-login {
+    margin-right: 10px;
+    color: #42b983;
+    cursor: pointer;
   }
 </style>

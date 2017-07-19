@@ -1,16 +1,11 @@
 <template lang='jade'>
-  .calendar(v-show='calendarVisible')
-    .calendar__navigation
-      .navigation__btn(@click='previousMonth()') <
-      .navigation__date {{ monthName + ' ' + year }}
-      .navigation__btn(@click='nextMonth()') >
-    .calendar__day-names-row
-      .calendar__day-name(v-for='day in dayNames')
-        span.calendar__day-name {{ day }}
-    .calendar__dates
-      .calendar__week(v-for='week in weekRows')
-        .calendar__day(v-for='day in week')
-          span.calendar__day-name(@click='setDate(day)') {{ day }}
+  .editor
+    .editor__inputs
+      input(v-model="taskNewName")
+      input(v-model="taskNewDate")
+    .editor__buttons
+      span(@click="saveTask") Save
+      span(@click="closeEditor") Close
 </template>
 
 <script>
@@ -18,18 +13,20 @@
   import moment from 'moment'
 
   export default {
-    name: 'date-select',
-    props: ['calendarVisible'],
+    name: 'task-editor',
+    props: ['taskName', 'taskDate'],
     mounted: function () {
       const year = moment().year()
       const month = moment().month()
       this.year = year
       this.month = month
       this.getCalendar(year, month)
-      document.addEventListener('click', this.hideCalendar)
+      this.taskNewName = this.props.taskName
+      this.taskNewDate = this.props.taskDate
+      document.addEventListener('click', this.hideEditor)
     },
     beforeDestroy: function () {
-      document.removeEventListener('click', this.hideCalendar)
+      document.removeEventListener('click', this.hideEditor)
     },
     data () {
       return {
@@ -62,7 +59,7 @@
       }
     },
     methods: {
-      hideCalendar (e) {
+      hideEditor (e) {
         const className = e.target.className
         const isCalendarNav = className.indexOf('navigation') + 1
         const isCalendarBody = className.indexOf('calendar') + 1
@@ -112,56 +109,15 @@
 </script>
 
 <style scoped>
-  .calendar {
+  .editor {
     display: flex;
     flex-direction: column;
     max-width: 250px;
     position: absolute;
     top: 30px;
-    border: solid 1px #ccc;
     padding: 15px;
+    background: #fff;
+    border: solid 1px #ccc;
   }
 
-  .calendar__navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-
-  .calendar__day-names-row {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: solid 1px #ccc;
-    margin-bottom: 15px;
-  }
-
-  .calendar__dates {
-    display: flex;
-    flex-direction: column;
-  }
-  .calendar__week {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    border-bottom: solid 1px #ccc;
-  }
-
-  .calendar__week:last-child {
-    border-bottom: none;
-  }
-
-  .calendar__day {
-    margin: 6px;
-    min-width: 20px;
-    min-height: 20px;
-    max-width: 20px;
-    max-height: 20px;
-    cursor: pointer;
-  }
-
-  .calendar__day-name {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
 </style>

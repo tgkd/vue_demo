@@ -1,6 +1,6 @@
 <template lang="jade">
   .actions-panel
-    ul.items
+    ul.actions
       li.action-item(v-for='action in actions',
                       v-on:click='setAction(action.name);action.method()',
                       :class="{'active-item': action.name === currentAction}") {{action.name}}
@@ -71,10 +71,11 @@
   .actions-panel {
     color: #4b4b4b;
   }
-  .items {
+  .actions {
     display: flex;
     justify-content: center;
     padding: 0;
+    margin-bottom: 35px;
   }
   .action-item {
     list-style: none;

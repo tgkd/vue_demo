@@ -1,17 +1,22 @@
 <template lang="jade">
   .tasks
-    h1.tasks__header Tasks
+    h1.tasks__header tasks
     actions-panel(:current-action='currentAction' v-on:setAction='setCurrentAction')
     p(v-if='tasks.length === 0') sry, u don't have {{ currentAction === 'all' ? '' : currentAction }} tasks
     .table
       .table__body
-        .task(v-for='task in tasks', v-if='tasks.length > 0')
+        .task(v-for='task in tasks', v-if='tasks.length > 0', @click='editorVisible = !editorVisible; currentEditorId = task.id')
           .task-id
             span.id {{ task.id }}
+            .editor-container(v-show="editorIsVisible(task.id)")
+              task-editor(v-on:updateTask="update",
+                          v-on:close="editorVisible = false",
+                          :task-name="task.name",
+                          :task-date="task.expires")
           .task-name
             span.name(:class="{'task-name--completed': task.done}") {{ task.name }}
           .task-expires
-            .expires {{ parseDate(task.expires) }}
+            .expires(:class="getTimeClass(task.expires)") {{ parseDate(task.expires) }}
           .task-checkbox
             input.checkbox(type='checkbox', :checked='task.done', v-on:change='update(task)')
           .task-rm
@@ -24,7 +29,7 @@
           .new-date
             span.new-task-date(@click='calendarVisible = !calendarVisible') {{newTaskDate}}
             .calendar-container
-              date-select(v-on:setDate='setDate', :calendar-visible='calendarVisible')
+              date-select(v-on:setDate='setDate', v-on:closeCalendar='calendarVisible = false', :calendar-visible='calendarVisible')
 </template>
 
 <script>
@@ -32,12 +37,14 @@
   import * as Cookies from 'js-cookie'
   import ActionsPanel from './ActionsPanel.vue'
   import DateSelect from './DateSelect.vue'
+  import TaskEditor from './TaskEdit.vue'
   import moment from 'moment'
   export default {
     name: 'tasks',
     components: {
       ActionsPanel,
-      DateSelect
+      DateSelect,
+      TaskEditor
     },
     mounted: function () {
       this.getTasks()
@@ -61,15 +68,22 @@
           name: '',
           date: moment()
         },
-        calendarVisible: false
+        calendarVisible: false,
+        editorVisible: false,
+        currentEditorId: null
       }
     },
     methods: {
-      closeCalendar () {
-        this.calendarVisible = false
+      editorIsVisible (id) {
+        return this.currentEditorId === id && this.editorVisible
       },
       parseDate (date) {
         return moment(date).format('DD/MM/YYYY HH:MM')
+      },
+      getTimeClass (date) {
+        const taskDate = moment(date)
+        const isBefore = moment().isBefore(taskDate, 'day')
+        return isBefore ? '' : 'date--expires'
       },
       setDate (date) {
         this.newTask.date = date
@@ -124,11 +138,19 @@
   .task {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     min-width: 400px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+
+  .task:hover {
+    background-color: rgba(65, 184, 131, 0.4);
   }
 
   .task-id {
     min-width: 20px;
+    position: relative;
   }
 
   .task-name {
@@ -143,9 +165,20 @@
     color: #41b883;
   }
 
+  .date--expires {
+    color: #d85740;
+  }
+
+  .task-rm {
+    position: relative;
+    left: 30px;
+  }
+
   .new-task {
     position: relative;
-    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
   }
 
   .input-add {
@@ -170,9 +203,7 @@
     cursor: pointer;
   }
 
-  .new-task {
-    display: flex;
-  }
+
 
   .new-task-date {
     position: relative;
