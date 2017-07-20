@@ -9,7 +9,6 @@
 </template>
 
 <script>
-  import getCalendar from './../libs/dateCreator'
   import moment from 'moment'
 
   export default {
@@ -30,79 +29,22 @@
     },
     data () {
       return {
-        selectedDate: null,
-        calendar: null,
-        dayNames: ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'],
-        month: moment().month(),
-        year: moment().year()
+        taskNewName: '',
+        taskNewDate: ''
       }
     },
     computed: {
-      weekRows: function () {
-        const calendar = this.calendar
-        if (calendar) {
-          return calendar.map((week) => {
-            let dayList = []
-
-            for (let day of week.by('days')) {
-              dayList.push(day)
-            }
-
-            return dayList.map((day) => {
-              return day.format('D')
-            })
-          })
-        }
-      },
-      monthName: function () {
-        return moment().month(this.month).format('MMMM')
-      }
     },
     methods: {
-      hideEditor (e) {
-        const className = e.target.className
-        const isCalendarNav = className.indexOf('navigation') + 1
-        const isCalendarBody = className.indexOf('calendar') + 1
-        const isDate = className.indexOf('new-task-date') + 1
-        if (isDate || isCalendarNav || isCalendarBody) {
-          e.preventDefault()
-        } else {
-          this.$emit('closeCalendar')
+      checkDate (date) {
+      },
+      saveTask () {
+        const taskInfo = {
+          name: this.taskNewName,
+          expires: this.taskNewDate,
+          done: false
         }
-      },
-      setDate (date) {
-        const momentDate = moment().date(date).month(this.month).year(this.year)
-        this.$emit('setDate', momentDate)
-      },
-      getCalendar (year, month) {
-        this.calendar = getCalendar(year, month)
-        this.year = year
-        this.month = month
-      },
-      nextMonth () {
-        const {month, year} = this
-        let newMonth
-        let newYear
-        if (month === 11) {
-          newMonth = 0
-          newYear = year + 1
-        } else {
-          newMonth = month + 1
-          newYear = year
-        }
-        this.getCalendar(newYear, newMonth)
-      },
-      previousMonth () {
-        let month
-        let year
-        if (this.month === 0) {
-          month = 11
-          year = this.year - 1
-        } else {
-          month = this.month - 1
-          year = this.year
-        }
-        this.getCalendar(year, month)
+        this.$emit('updateTask', taskInfo)
       }
     }
   }
