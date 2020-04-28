@@ -1,6 +1,16 @@
-# Vue.JS Todo
+# VueJS Todo
 
-> Vue.js 2 + Vuex + Vue router
+> VueJS 2 + Vuex + Vue router
+
+simple TODO list with auth
+
+actions
+ - create
+ - update
+ - delete
+ - filters (all/completed/active)
+  
+ 
 
 ## Build Setup
 
